@@ -5,7 +5,7 @@
 //
 // This code is taken (besides some minor modifications) from golang.org/x/crypto/sha3/sha3.go
 //
-package keccak
+package K12
 
 // spongeDirection indicates the direction bytes are flowing through the sponge.
 type spongeDirection int

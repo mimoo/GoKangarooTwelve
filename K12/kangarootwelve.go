@@ -1,4 +1,4 @@
-package keccak
+package K12
 
 import (
 	"encoding/binary"

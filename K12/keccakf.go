@@ -4,7 +4,7 @@
 
 //  +build !amd64 appengine gccgo
 
-package keccak
+package K12
 
 // rc stores the round constants for use in the ι step.
 var rc = [24]uint64{

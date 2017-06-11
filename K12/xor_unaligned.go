@@ -5,7 +5,7 @@
 // +build amd64 386 ppc64le
 // +build !appengine
 
-package keccak
+package K12
 
 import "unsafe"
 

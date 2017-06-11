@@ -4,7 +4,7 @@
 
 // +build !amd64,!386,!ppc64le appengine
 
-package keccak
+package K12
 
 var (
 	xorIn            = xorInGeneric
