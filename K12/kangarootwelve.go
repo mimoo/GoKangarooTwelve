@@ -1,3 +1,9 @@
+//
+// Do whatever you want with this file
+// Author: David Wong
+// Contact: https://www.cryptologie.net/contact
+//
+
 package K12
 
 import (
@@ -8,7 +14,9 @@ import (
 // High level API
 //
 
-// I dit not follow golang.org/x/crypto/sha3/shake.go and did not defined a new interface here
+// The constructor requires a customization string.
+// It can be: empty, the name of your application, etc...
+// Note: I dit not follow golang.org/x/crypto/sha3/shake.go and did not defined a new interface here
 func NewK12(customString []byte) treeState {
 	return treeState{
 		customString: customString,
@@ -17,18 +25,21 @@ func NewK12(customString []byte) treeState {
 	}
 }
 
-// I dit not follow golang.org/x/crypto/sha3/shake.go and inversed data and hash
+// A single-use function for
+// Note: I dit not follow golang.org/x/crypto/sha3/shake.go and reversed the `data` and `hash` arguments
 func K12Sum(customString, data, hash []byte) {
 	h := NewK12(customString)
 	h.Write(data)
 	h.Read(hash)
 }
 
+// Allows you to read while preserving the original state
 func (t *treeState) Clone() *treeState {
 	ret := *t
 	return &ret
 }
 
+// Allows you to re-use a K12 instance.
 func (t *treeState) Reset() {
 	t.state.Reset()
 	t.currentChunk.Reset()
@@ -54,14 +65,14 @@ type treeState struct {
 	tempChunkOutput [256 / 8]byte   // needed to truncate a chunk's output
 }
 
-// Write absorbs more data into the hash's state. It produces an error
-// if more data is written to the ShakeHash after writing
+// Write absorbs more data into the hash's state.
+// It doesn't produce an error at the moment.
 func (t *treeState) Write(p []byte) (written int, err error) {
 
 	//
 	written = len(p)
 
-	//
+	// absorbing 🍟
 	for len(p) > 0 {
 		// we reached the end of the chunk → we create a new chunk
 		if t.currentWritten == maxChunk {
@@ -139,7 +150,7 @@ func (t *treeState) Read(out []byte) (n int, err error) {
 // Helpers
 //
 
-// Helper function for the initialization of KangarooTwelve
+// Encodes the length of a value. It is used in the final padding of K12
 func right_encode(value uint64) []byte {
 	var input [9]byte
 	var offset int
