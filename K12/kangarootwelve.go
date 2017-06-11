@@ -2,6 +2,7 @@ package K12
 
 import (
 	"encoding/binary"
+	"fmt"
 )
 
 //
@@ -65,6 +66,7 @@ func (t *treeState) Write(p []byte) (written int, err error) {
 	for len(p) > 0 {
 		// we reached the end of the chunk → we create a new chunk
 		if t.currentWritten == maxChunk {
+
 			if t.numChunk == 0 {
 				// pad the main state
 				t.state.Write([]byte{0x03, 0, 0, 0, 0, 0, 0, 0}) // 110^62
@@ -76,7 +78,9 @@ func (t *treeState) Write(p []byte) (written int, err error) {
 			}
 
 			// on to the new chunk!
+			t.currentWritten = 0
 			t.numChunk++
+			fmt.Println("creating new chunk")
 		}
 
 		// we figure out how much data we can write
@@ -85,11 +89,14 @@ func (t *treeState) Write(p []byte) (written int, err error) {
 			todo = len(p)
 		}
 
+		var written int
 		if t.numChunk == 0 {
-			t.state.Write(p[:todo])
+			written, _ = t.state.Write(p[:todo])
 		} else {
-			t.currentChunk.Write(p[:todo])
+			written, _ = t.currentChunk.Write(p[:todo])
 		}
+
+		t.currentWritten += written
 
 		// what's left for the loop
 		p = p[todo:]
@@ -107,6 +114,8 @@ func (t *treeState) Read(out []byte) (n int, err error) {
 		// custom string
 		t.Write(t.customString)
 		t.Write(right_encode(uint64(len(t.customString))))
+
+		// padding
 		if t.numChunk == 0 {
 			// one chunk
 			t.state.dsbyte = 0x07 // 11|10 0000
