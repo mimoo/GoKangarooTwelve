@@ -11,6 +11,25 @@ import (
 )
 
 //
+// Objects & Constants
+//
+
+const (
+	maxChunk = 8192 // size of a K12 chunk
+)
+
+// main K12 object with two distincts sponge states
+type treeState struct {
+	customString    []byte
+	phase           spongeDirection // to avoid absorbing when we're already in the squeezing phase
+	state           state           // the main state
+	numChunk        int             // needed for logic and padding
+	currentChunk    state           // not for the first chunk
+	currentWritten  int             // needed to know if we switch to a different chunk
+	tempChunkOutput [256 / 8]byte   // needed to truncate a chunk's output
+}
+
+//
 // High level API
 //
 
@@ -44,25 +63,6 @@ func (t *treeState) Reset() {
 	t.state.Reset()
 	t.currentChunk.Reset()
 	t.phase = spongeAbsorbing
-}
-
-//
-// Objects & Constants
-//
-
-const (
-	maxChunk = 8192 // size of a K12 chunk
-)
-
-// main object with two distincts sponge states
-type treeState struct {
-	customString    []byte
-	phase           spongeDirection // to avoid absorbing when we're already in the squeezing phase
-	state           state           // the main state
-	numChunk        int             // needed for logic and padding
-	currentChunk    state           // not for the first chunk
-	currentWritten  int             // needed to know if we switch to a different chunk
-	tempChunkOutput [256 / 8]byte   // needed to truncate a chunk's output
 }
 
 // Write absorbs more data into the hash's state.
