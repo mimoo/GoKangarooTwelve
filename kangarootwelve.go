@@ -2,7 +2,6 @@ package keccak
 
 import (
 	"encoding/binary"
-	"fmt"
 )
 
 //
@@ -108,7 +107,6 @@ func (t *treeState) Read(out []byte) (n int, err error) {
 		// custom string
 		t.Write(t.customString)
 		t.Write(right_encode(uint64(len(t.customString))))
-		fmt.Println("test")
 		if t.numChunk == 0 {
 			// one chunk
 			t.state.dsbyte = 0x07 // 11|10 0000
