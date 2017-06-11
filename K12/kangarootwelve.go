@@ -2,7 +2,6 @@ package K12
 
 import (
 	"encoding/binary"
-	"fmt"
 )
 
 //
@@ -14,7 +13,7 @@ func NewK12(customString []byte) treeState {
 	return treeState{
 		customString: customString,
 		state:        state{rate: 168},
-		currentChunk: state{rate: 168, dsbyte: 0x0d},
+		currentChunk: state{rate: 168, dsbyte: 0x0b},
 	}
 }
 
@@ -80,7 +79,6 @@ func (t *treeState) Write(p []byte) (written int, err error) {
 			// on to the new chunk!
 			t.currentWritten = 0
 			t.numChunk++
-			fmt.Println("creating new chunk")
 		}
 
 		// we figure out how much data we can write
@@ -121,7 +119,10 @@ func (t *treeState) Read(out []byte) (n int, err error) {
 			t.state.dsbyte = 0x07 // 11|10 0000
 		} else {
 			// many chunks
-			t.state.Write(right_encode(uint64(t.numChunk + 1)))
+			t.currentChunk.Read(t.tempChunkOutput[:]) // padding is in dsByte of t.currentChunk
+			t.state.Write(t.tempChunkOutput[:])
+
+			t.state.Write(right_encode(uint64(t.numChunk)))
 			t.state.Write([]byte{0xff, 0xff})
 			t.state.dsbyte = 0x06 // 01|10 0000
 		}
