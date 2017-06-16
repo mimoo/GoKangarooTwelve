@@ -2,7 +2,7 @@
 
 This is an implementation of [KangarooTwelve](http://keccak.noekeon.org/kangarootwelve.html) in Go.
 
-It is heavily based on the official Go's [x/crypto/sha3](https://godoc.org/golang.org/x/crypto/sha3) library. But because of minor implementation details the relevant files have been copied and modified here so you do not need Go's SHA-3 implementation to run this package. Hopefuly one day Go's SHA-3 library will be more flexible to allow other keccak construction to rely on it.
+It is heavily based on the official Go's [x/crypto/sha3](https://godoc.org/golang.org/x/crypto/sha3) library. But because of minor implementation details the relevant files have been copied and modified here so you do not need Go's SHA-3 implementation to run this package. Hopefully one day Go's SHA-3 library will be more flexible to allow other keccak construction to rely on it.
 
 I have tested this implementation with different test vectors and it works fine. Note that it has not received proper peer review. If you look at the code and find issues (or not) please [let me know](https://www.cryptologie.net/contact/)!
 
@@ -27,16 +27,23 @@ import(
 
 func main(){
     // custom string allows you to customize your hash function 🙃
-    customString = []byte("myWebsite.com")
+    customString = []byte("davidwong.fr")
     hash := K12.NewK12(customString)
+
+	// we absorb the payload
     payload := []byte("salut!")
     hash.Write(payload)
-    out := make([]byte, 30)
-    a.Read(out)
+
+	// we squeeze a 32 output
+    out := make([]byte, 32)
+    hash.Read(out)
+
     fmt.Println(hex.EncodeToString(out))
 
-    // or simpler
-    fmt.Println(hex.EncodeToString(K12Sum(customString, payload, out)
+    // or simpler with K12Sum()
+    K12Sum(customString, payload, out)
+
+    fmt.Println(hex.EncodeToString(out))
 }
 ```
 
