@@ -69,6 +69,9 @@ func (t *treeState) Reset() {
 // It doesn't produce an error at the moment.
 func (t *treeState) Write(p []byte) (written int, err error) {
 
+	if t.phase != spongeAbsorbing {
+		panic("cannot write after read")
+	}
 	//
 	written = len(p)
 
@@ -137,6 +140,7 @@ func (t *treeState) Read(out []byte) (n int, err error) {
 			t.state.Write([]byte{0xff, 0xff})
 			t.state.dsbyte = 0x06 // 01|10 0000
 		}
+		t.phase = spongeSqueezing
 	}
 
 	// rely on the sponge's function to read
